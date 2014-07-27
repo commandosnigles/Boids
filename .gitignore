@@ -24,8 +24,7 @@
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
-
+Icon
 # Thumbnails
 ._*
 
@@ -51,3 +50,18 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
+# Ignore The following directories / file extensions
+Library
+Library/*
+Temp
+Builds
+.DS_Store
+
+# Ignore the following file extensions
+*.exe
+*.csproj
+*.vcproject
+*.sln
+*.userprefs
+*.pidb
