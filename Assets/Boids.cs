@@ -7,6 +7,7 @@ public class Boids : MonoBehaviour {
 	public GameObject Target;
 	public int Count = 10;
 	public float MaxSpeed = 0.01f;
+	public float TurnSpeed = 0.1f;
 	public float SpawnRadius = 3f;
 	public float NeighborhoodRange = 1.0f;
 	public float TargetWeight = 1f;
@@ -66,7 +67,6 @@ public class Boids : MonoBehaviour {
 
 			}
 		}
-
 	}
 
 	void MoveBoid (Rigidbody self) {
@@ -75,8 +75,6 @@ public class Boids : MonoBehaviour {
 		Vector3 direction = Vector3.zero;
 		Vector3 avoidance = Vector3.zero;
 		ArrayList neighborhood = new ArrayList();
-
-
 
 		if (boids.Count > 1) {
 
@@ -115,11 +113,19 @@ public class Boids : MonoBehaviour {
 			else
 				target = (Target.transform.position - self.transform.position);
 		}
+		// create a new target heading based on the influence of the flock
+		Vector3 influence = Vector3.ClampMagnitude (target + center + direction + avoidance, MaxSpeed) + Current;
+		if (influence == Vector3.zero)
+			influence = self.transform.forward * MaxSpeed;
+		// influence is gradually applied
+		influence = Vector3.RotateTowards (self.transform.forward, influence, TurnSpeed, 0f);
 
-		Vector3 translation = Vector3.ClampMagnitude (target + center + direction + avoidance, MaxSpeed) + Current;
-		if (translation == Vector3.zero)
-			translation = self.velocity;
-		self.velocity = translation;
+		// calculate rotation based on target heading and newly calculated banking up vector
+		Quaternion rotation = Quaternion.LookRotation (influence, ((influence - self.transform.forward) + Vector3.up));
+
+		// apply rotation and apply velocity
+		self.transform.rotation = rotation;
+		self.velocity = self.transform.forward * MaxSpeed;
 	}
 
 	Vector3 RandomV3 (float radius) {
